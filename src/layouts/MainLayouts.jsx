@@ -5,11 +5,13 @@ import { Outlet } from "react-router";
 const MainLayouts = () => {
   return (
     <>
-      <Navbar />
+      
+        
+        <Navbar />
 
-      <Outlet />
+        <Outlet />
 
-      <Footer />
+        <Footer />
     </>
   );
 };
