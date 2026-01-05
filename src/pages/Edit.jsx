@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { UserContext } from "../context/UserContext";
 import PostService from "../services/post.service";

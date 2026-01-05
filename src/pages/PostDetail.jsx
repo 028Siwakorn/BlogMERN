@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
@@ -8,7 +8,7 @@ import PostService from "../services/post.service";
 const PostDetail = () => {
   const { id } = useParams();
   const { userInfo } = useContext(UserContext);
-
+  const navigate = useNavigate();
   const [post, setPost] = useState({
     id: "",
     tile: "",
@@ -41,12 +41,13 @@ const PostDetail = () => {
       const response = await PostService.deletePost(post._id);
       if (response.status === 200) {
         alert("Post deleted successfully!");
-        window.location.reload();
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <div className="post-page min-h-full min-w-full items-center justify-center p-4 pt-20">
       <div className="bg-white p-8 rounded-b-lg shadow-lg max-4xl w-full">

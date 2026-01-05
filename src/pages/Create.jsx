@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import PostService from "../services/post.service.js";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
+import Editor from "../components/Editor.jsx";
 
 const Create = () => {
   const navigate = useNavigate();
-
+  const editorRef = useRef(null);
+  const [content, setContent] = useState("");
   const [post, setPost] = useState({
     title: "",
     author: "",
@@ -15,8 +17,23 @@ const Create = () => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setPost((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (files) {
+      setPost({
+        ...post,
+        [name]: e.target.files[0],
+      });
+    } else {
+      setPost({
+        ...post,
+        [name]: value,
+      });
+    }
+  };
+
+  const handleContentChange = (value) => {
+    setContent(value);
+    setPost({ ...post, content: content });
   };
 
   const resetForm = () => {
@@ -34,6 +51,11 @@ const Create = () => {
 
     try {
       const res = await PostService.createPost(post);
+      const data = new FormData();
+      data.set("title", post.title);
+      data.set("summary", post.summary);
+      data.set("content", post.content);
+      data.set("file", post.file);
 
       if (res.status === 201 || res.status === 200) {
         await Swal.fire({
@@ -68,24 +90,23 @@ const Create = () => {
               {/* LEFT: COVER */}
               <div className="md:col-span-1">
                 <label className="label">
-                  <span className="label-text font-semibold">
-                    Cover Image URL
-                  </span>
+                  <span className="label-text font-semibold">Cover Image</span>
                 </label>
+
                 <input
-                  type="text"
-                  name="cover"
-                  value={post.cover}
+                  type="file"
+                  name="file"
+                  accept="image/*"
                   onChange={handleChange}
-                  placeholder="https://example.com/image.jpg"
-                  className="input input-bordered w-full"
+                  className="file-input file-input-bordered w-full"
                 />
 
                 <div className="mt-4">
                   <img
                     src={
-                      post.cover ||
-                      "https://vaultproducts.ca/cdn/shop/products/4454FC90-DAF5-43EF-8ACA-A1FF04CE802D.jpg?v=1656626547"
+                      post.file
+                        ? URL.createObjectURL(post.file)
+                        : "https://vaultproducts.ca/cdn/shop/products/4454FC90-DAF5-43EF-8ACA-A1FF04CE802D.jpg?v=1656626547"
                     }
                     alt="cover preview"
                     className="object-contain h-56 w-full rounded-lg border"
@@ -112,21 +133,6 @@ const Create = () => {
 
                 <div>
                   <label className="label">
-                    <span className="label-text font-semibold">Author</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="author"
-                    value={post.author}
-                    onChange={handleChange}
-                    placeholder="Author name"
-                    className="input input-bordered w-full"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="label">
                     <span className="label-text font-semibold">Summary</span>
                   </label>
                   <textarea
@@ -143,15 +149,13 @@ const Create = () => {
                   <label className="label">
                     <span className="label-text font-semibold">Content</span>
                   </label>
-                  <textarea
-                    name="content"
-                    value={post.content}
-                    onChange={handleChange}
-                    placeholder="Write your post content here..."
-                    className="textarea textarea-bordered w-full"
-                    rows={6}
-                    required
-                  />
+                  <div className="h-64">
+                    <Editor
+                      value={content}
+                      onChange={handleContentChange}
+                      ref={editorRef}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -165,7 +169,7 @@ const Create = () => {
                   Reset
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  Add Post
+                  Create Post
                 </button>
               </div>
             </form>
