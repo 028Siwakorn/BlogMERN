@@ -1,8 +1,7 @@
 import React from "react";
 
-function Author() {
+const Author = () => {
   return <div>Author</div>;
-}
+};
 
 export default Author;
-    
