@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
+
   useEffect(() => {
     const fetchAllPost = async () => {
       try {
@@ -22,13 +23,31 @@ const Home = () => {
     };
     fetchAllPost();
   }, []);
+
   return (
-    <div className="space-y-4">
-      {posts.length > 0 &&
-        posts.map((post, index) => (
-          <Post key={index} index={index} {...post} />
-        ))}
-      {posts.length === 0 && <h1> No post </h1>}
+    <div className="container mx-auto mt-10">
+      <h1 className="text-3xl font-bold text-center mb-8 text-base-content underline decoration-2 underline-offset-4">
+        Latest Posts
+      </h1>
+
+      {posts.length === 0 && (
+        <h2 className="text-center text-base-content/60 text-xl mt-10">
+          No posts available
+        </h2>
+      )}
+
+      {posts.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post, index) => (
+            <div
+              key={index}
+              className="card bg-base-100 shadow-lg hover:shadow-2xl transition-shadow duration-300"
+            >
+              <Post {...post} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
