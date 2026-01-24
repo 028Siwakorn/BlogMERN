@@ -13,7 +13,7 @@ const Create = () => {
     author: "",
     summary: "",
     content: "",
-    cover: "",
+    cover: null,
   });
 
   const handleChange = (e) => {
@@ -33,7 +33,7 @@ const Create = () => {
 
   const handleContentChange = (value) => {
     setContent(value);
-    setPost({ ...post, content: content });
+    setPost({ ...post, content: value });
   };
 
   const resetForm = () => {
@@ -42,7 +42,7 @@ const Create = () => {
       author: "",
       summary: "",
       content: "",
-      cover: "",
+      cover: null,
     });
   };
 
@@ -50,12 +50,14 @@ const Create = () => {
     e.preventDefault();
 
     try {
-      const res = await PostService.createPost(post);
       const data = new FormData();
       data.set("title", post.title);
       data.set("summary", post.summary);
       data.set("content", post.content);
-      data.set("file", post.file);
+      // backend expects field name 'cover' (multer .single('cover'))
+      if (post.cover) data.set("cover", post.cover);
+
+      const res = await PostService.createPost(data);
 
       if (res.status === 201 || res.status === 200) {
         await Swal.fire({
@@ -95,7 +97,7 @@ const Create = () => {
 
                 <input
                   type="file"
-                  name="file"
+                  name="cover"
                   accept="image/*"
                   onChange={handleChange}
                   className="file-input file-input-bordered w-full"
@@ -104,8 +106,8 @@ const Create = () => {
                 <div className="mt-4">
                   <img
                     src={
-                      post.file
-                        ? URL.createObjectURL(post.file)
+                      post.cover
+                        ? URL.createObjectURL(post.cover)
                         : "https://vaultproducts.ca/cdn/shop/products/4454FC90-DAF5-43EF-8ACA-A1FF04CE802D.jpg?v=1656626547"
                     }
                     alt="cover preview"
